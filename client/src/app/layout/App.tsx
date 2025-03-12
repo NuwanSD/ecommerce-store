@@ -1,9 +1,32 @@
 import { useEffect, useState } from "react";
 import { Product } from "../models/product";
 import Catalog from "../../features/catalog/Catalog";
+import {
+  Box,
+  Container,
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import NavBar from "./NavBar";
 
 const App = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const palletType = darkMode ? "dark" : "light";
+
+  const theme = createTheme({
+    palette: {
+      mode: palletType,
+      background: {
+        default: palletType === "light" ? "#eaeaea" : "#121212",
+      },
+    },
+  });
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     fetch("https://localhost:5001/api/products")
@@ -11,27 +34,24 @@ const App = () => {
       .then((data) => setProducts(data));
   }, []);
 
-  const addProduct = () => {
-    setProducts((prevState) => [
-      ...prevState,
-      {
-        id: prevState.length + 1,
-        name: "Product" + (prevState.length + 1),
-        price: prevState.length * 100 + 100,
-        quantityInStock: 100,
-        description: "test",
-        pictureUrl: "https://picsum.photo/200",
-        type: "test",
-        brand: "test",
-      },
-    ]);
-  };
-
   return (
-    <div>
-      <h1 style={{ color: "red" }}>Ecommerce-Store</h1>
-      <Catalog products={products} addProduct={addProduct} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/*It removes the default browser css styles*/}
+      <NavBar toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: darkMode
+            ? "radial-gradient(circle, #1e3aba, #111B27)"
+            : "radial-gradient(circle, #baecf9, #f0f9ff)",
+          py: 6,
+        }}
+      >
+        <Container maxWidth="xl" sx={{ mt: 8 }}>
+          <Catalog products={products} />
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 };
 
