@@ -6,7 +6,7 @@ import {
   createTheme,
 } from "@mui/material";
 import NavBar from "./NavBar";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import { useAppSelector } from "../store/store";
 
 const App = () => {
@@ -24,6 +24,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <ScrollRestoration />
       <CssBaseline /> {/*It removes the default browser css styles*/}
       <NavBar />
       <Box
