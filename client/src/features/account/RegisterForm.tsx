@@ -1,38 +1,50 @@
+import { useForm } from "react-hook-form";
+import { useRegisterMutation } from "./accountApi";
+import {
+  RegisterSchema,
+  registerSchema,
+} from "../../lib/schemas/registerSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LockOutlined } from "@mui/icons-material";
 import {
-  Box,
-  Button,
   Container,
   Paper,
-  TextField,
+  Box,
   Typography,
+  TextField,
+  Button,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LoginSchema, loginSchema } from "../../lib/schemas/LoginSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useLazyUserInfoQuery, useLoginMutation } from "./accountApi";
+import { Link } from "react-router-dom";
 
-export default function LoginForm() {
-  const [login, { isLoading }] = useLoginMutation();
-  const [fetchUserInfo] = useLazyUserInfoQuery();
-  const location = useLocation();
-
+export default function RegisterForm() {
+  const [registerUser] = useRegisterMutation();
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginSchema>({
+    setError,
+    formState: { errors, isValid, isLoading },
+  } = useForm<RegisterSchema>({
     mode: "onTouched",
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
 
-  const navigate = useNavigate();
+  const onSubmit = async (data: RegisterSchema) => {
+    try {
+      await registerUser(data).unwrap();
+    } catch (error) {
+      const apiError = error as { message: string };
+      if (apiError.message && typeof apiError.message === "string") {
+        const errorArray = apiError.message.split(",");
 
-  const onSubmit = async (data: LoginSchema) => {
-    await login(data);
-    await fetchUserInfo();
-    navigate(location.state?.from || "/catalog");
+        errorArray.forEach((e) => {
+          if (e.includes("Password")) {
+            setError("password", { message: e });
+          } else if (e.includes("Email")) {
+            setError("email", { message: e });
+          }
+        });
+      }
+    }
   };
 
   return (
@@ -44,7 +56,7 @@ export default function LoginForm() {
         marginTop="8"
       >
         <LockOutlined sx={{ mt: 3, color: "secondary.main", fontSize: 40 }} />
-        <Typography variant="h5">Sign In</Typography>
+        <Typography variant="h5">Register</Typography>
         <Box
           component="form"
           onSubmit={handleSubmit(onSubmit)}
@@ -59,7 +71,7 @@ export default function LoginForm() {
             label="Email"
             autoFocus
             {...register("email")}
-            error={!!errors.email} //cast into boolean
+            error={!!errors.email}
             helperText={errors.email?.message}
           />
 
@@ -72,19 +84,23 @@ export default function LoginForm() {
             helperText={errors.password?.message}
           />
 
-          <Button disabled={isLoading} variant="contained" type="submit">
-            Sign in
+          <Button
+            disabled={isLoading || !isValid}
+            variant="contained"
+            type="submit"
+          >
+            Register
           </Button>
 
           <Typography sx={{ textAlign: "center" }}>
-            Don't have an account?
+            Already have an account?
             <Typography
               sx={{ ml: 1 }}
               component={Link}
-              to="/register"
+              to="/login"
               color="primary"
             >
-              Sign up
+              Sign in
             </Typography>
           </Typography>
         </Box>
