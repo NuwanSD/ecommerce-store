@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithErrorHandling } from "../../app/api/baseApi";
 import { Address, User } from "../../app/models/user";
-import { LoginSchema } from "../../lib/schemas/LoginSchema";
+import { LoginSchema } from "../../lib/schemas/loginSchema";
 import { router } from "../../app/routes/Routes";
 import { toast } from "react-toastify";
 

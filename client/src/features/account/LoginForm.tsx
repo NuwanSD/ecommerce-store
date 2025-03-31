@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LoginSchema, loginSchema } from "../../lib/schemas/LoginSchema";
+import { LoginSchema, loginSchema } from "../../lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLazyUserInfoQuery, useLoginMutation } from "./accountApi";
 
